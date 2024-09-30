@@ -18,22 +18,27 @@ window.onload = function() {
             tile.id = r.toString() + "-" + c.toString();
             tile.src = "images/" + imgOrder.shift() + ".jpg";
 
-            //DRAG FUNCTIONALITY
-            tile.addEventListener("dragstart", dragStart);  //click an image to drag
-            tile.addEventListener("dragover", dragOver);    //moving image around while clicked
-            tile.addEventListener("dragenter", dragEnter);  //dragging image onto another one
-            tile.addEventListener("dragleave", dragLeave);  //dragged image leaving another image
-            tile.addEventListener("drop", dragDrop);        //drag an image over another image, drop the image
-            tile.addEventListener("dragend", dragEnd);      //after drag drop, swap the two tiles
+            // DRAG FUNCTIONALITY
+            tile.addEventListener("dragstart", dragStart);
+            tile.addEventListener("dragover", dragOver);
+            tile.addEventListener("dragenter", dragEnter);
+            tile.addEventListener("dragleave", dragLeave);
+            tile.addEventListener("drop", dragDrop);
+            tile.addEventListener("dragend", dragEnd);
+
+            // TOUCH FUNCTIONALITY
+            tile.addEventListener("touchstart", touchStart);
+            tile.addEventListener("touchmove", touchMove);
+            tile.addEventListener("touchend", touchEnd);
 
             document.getElementById("board").append(tile);
-
         }
     }
 }
 
+// DRAG EVENTS (for desktop)
 function dragStart() {
-    currTile = this; //this refers to the img tile being dragged
+    currTile = this; // this refers to the img tile being dragged
 }
 
 function dragOver(e) {
@@ -44,20 +49,39 @@ function dragEnter(e) {
     e.preventDefault();
 }
 
-function dragLeave() {
-
-}
+function dragLeave() {}
 
 function dragDrop() {
-    otherTile = this; //this refers to the img tile being dropped on
+    otherTile = this; // this refers to the img tile being dropped on
 }
 
 function dragEnd() {
+    swapTiles();
+}
+
+// TOUCH EVENTS (for mobile)
+function touchStart(e) {
+    currTile = e.target; // target image that starts the touch
+}
+
+function touchMove(e) {
+    e.preventDefault(); // prevent default scrolling behavior
+}
+
+function touchEnd(e) {
+    otherTile = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    if (otherTile && otherTile.tagName === "IMG") {
+        swapTiles();
+    }
+}
+
+// COMMON FUNCTIONALITY
+function swapTiles() {
     if (!otherTile.src.includes("images/3.jpg")) {
         return;
     }
 
-    let currCoords = currTile.id.split("-"); //ex) "0-0" -> ["0", "0"]
+    let currCoords = currTile.id.split("-"); // ex) "0-0" -> ["0", "0"]
     let r = parseInt(currCoords[0]);
     let c = parseInt(currCoords[1]);
 
